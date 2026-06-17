@@ -1,10 +1,15 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SMS Blaster
+
+An automated SMS campaign management platform using Android devices as gateways.
+
+## Documentation
+- [Technical Documentation](docs/TECHNICAL.md) - For developers and system administrators.
+- [User Guide](docs/USER_GUIDE.md) - For end-users and campaign managers.
 
 ## Getting Started
 
 First, run the development server:
 
-```bash
 npm run dev
 # or
 yarn dev
