@@ -45,7 +45,7 @@ export default function DashboardLayout({
   const navItems = [
     { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { label: 'Contacts', href: '/dashboard/contacts', icon: Users },
-    { label: 'Campaigns', href: '/dashboard/campaigns', icon: MessageSquare },
+    { label: 'Bulk SMS', href: '/dashboard/bulk-sms', icon: MessageSquare },
     { label: 'Devices', href: '/dashboard/devices', icon: Smartphone },
   ];
 

@@ -83,34 +83,27 @@ function DeleteDeviceButton({ deviceId }: { deviceId: string }) {
 export default function DevicesPage() {
   const [devices, setDevices] = useState<AndroidDevice[]>([]);
   const [loadingDevices, setLoadingDevices] = useState(true);
-  const supabase = useSupabase(); // Use the hook
 
   useEffect(() => {
     const fetchDevices = async () => {
       setLoadingDevices(true);
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        setLoadingDevices(false);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('android_devices')
-        .select('id, device_name, device_id, last_seen_at, status, device_type, gateway_url')
-        .eq('user_id', user.id)
-        .order('device_name', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching devices:', error);
-        toast.error('Error loading devices.', { description: error.message });
-      } else {
+      try {
+        const response = await fetch('/api/devices');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
         setDevices(data || []);
+      } catch (error: unknown) {
+        console.error('Error fetching devices:', error);
+        const description = error instanceof Error ? error.message : 'Failed to fetch';
+        toast.error('Error loading devices.', { description });
+      } finally {
+        setLoadingDevices(false);
       }
-      setLoadingDevices(false);
     };
     fetchDevices();
-  }, [supabase]);
+  }, []);
 
   if (loadingDevices) {
     return (

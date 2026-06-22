@@ -151,7 +151,7 @@ export default function ImportContactsPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <Card className="max-w-md mx-auto">
+      <Card className="max-w-md mx-auto border-white/5 bg-white/2">
         <CardHeader>
           <CardTitle>Import Contacts</CardTitle>
           <CardDescription>
@@ -161,19 +161,21 @@ export default function ImportContactsPage() {
         <CardContent>
           <form onSubmit={handleImport} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="csvFile">CSV File</Label>
+              <Label htmlFor="csvFile" className="text-white">CSV File</Label>
               <Input
                 id="csvFile"
                 type="file"
                 accept=".csv"
                 onChange={handleFileChange}
                 disabled={importing}
+                className="bg-black/20 border-white/10 rounded-xl focus:border-accent/50 text-white cursor-pointer"
               />
             </div>
-            <div className="flex justify-between gap-4">
+            <div className="pt-4 flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="outline"
+                className="border-white/10 hover:bg-white/5 text-white"
                 onClick={() => router.back()}
                 disabled={importing}
               >

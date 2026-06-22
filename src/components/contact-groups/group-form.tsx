@@ -16,6 +16,13 @@ import { Label } from '@/components/ui/label';
 import { useSupabase } from '@/components/supabase-provider'; // Import useSupabase
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -77,29 +84,52 @@ export function GroupForm({ initialData, groupId }: GroupFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <Label className="text-white">Group Name</Label>
-              <FormControl>
-                <Input placeholder="Family, Friends, Clients" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting
-            ? 'Saving...'
-            : groupId
-            ? 'Save Changes'
-            : 'Create Group'}
-        </Button>
-      </form>
-    </Form>
+    <Card className="max-w-xl mx-auto border-white/5 bg-white/2">
+      <CardHeader>
+        <CardTitle>{groupId ? 'Edit Contact Group' : 'New Contact Group'}</CardTitle>
+        <CardDescription>
+          {groupId 
+            ? 'Update the name of this contact group.' 
+            : 'Fill in the information to create a new contact group.'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="text-white">Group Name</Label>
+                  <FormControl>
+                    <Input placeholder="Family, Friends, Clients" className="bg-black/20 border-white/10 rounded-xl focus:border-accent/50 text-white" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="pt-4 flex items-center justify-end gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="border-white/10 hover:bg-white/5 text-white"
+                onClick={() => router.back()}
+                disabled={form.formState.isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting
+                  ? 'Saving...'
+                  : groupId
+                  ? 'Save Changes'
+                  : 'Create Group'}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

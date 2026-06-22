@@ -2,10 +2,33 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import { checkAndUpdateDeviceStatuses } from '@/lib/sms/device-status';
 
 // Helper function to hash API keys
 function hashApiKey(apiKey: string): string {
   return crypto.createHash('sha256').update(apiKey).digest('hex');
+}
+
+export async function GET(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const devices = await checkAndUpdateDeviceStatuses(supabase, user.id);
+    return NextResponse.json(devices);
+  } catch (err: any) {
+    console.error('Error checking device statuses:', err);
+    return NextResponse.json(
+      { error: 'Failed to retrieve/check device statuses', details: err.message },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -38,7 +61,7 @@ export async function POST(req: NextRequest) {
     api_key_hash: hashedApiKey,
     device_type: device_type,
     gateway_url: gateway_url,
-    status: device_type === 'mymobkit' ? 'online' : 'pending', // Mymobkit is online as soon as registered if URL is provided
+    status: 'pending', // Always start as pending until verified/connected
   });
 
   if (error) {
@@ -60,3 +83,4 @@ export async function POST(req: NextRequest) {
     { status: 201 }
   );
 }
+

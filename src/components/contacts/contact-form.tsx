@@ -147,7 +147,7 @@ export function ContactForm({ initialData, contactId }: ContactFormProps) {
   };
 
   return (
-    <Card className="max-w-xl mx-auto border-slate-200 shadow-sm rounded-2xl">
+    <Card className="max-w-xl mx-auto border-white/5 bg-white/2">
       <CardHeader>
         <CardTitle>{contactId ? 'Edit Contact' : 'New Contact'}</CardTitle>
         <CardDescription>
@@ -166,7 +166,7 @@ export function ContactForm({ initialData, contactId }: ContactFormProps) {
                 <FormItem>
                   <Label className="text-white">Full Name</Label>
                   <FormControl>
-                    <Input placeholder="John Doe" className="rounded-xl border-slate-200 focus:ring-blue-500" {...field} />
+                    <Input placeholder="John Doe" className="bg-black/20 border-white/10 rounded-xl focus:border-accent/50 text-white" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -179,7 +179,7 @@ export function ContactForm({ initialData, contactId }: ContactFormProps) {
                 <FormItem>
                   <Label className="text-white">Phone Number</Label>
                   <FormControl>
-                    <Input placeholder="09xxxxxxxxx or +63xxxxxxxxx" className="rounded-xl border-slate-200 focus:ring-blue-500" {...field} />
+                    <Input placeholder="09xxxxxxxxx or +63xxxxxxxxx" className="bg-black/20 border-white/10 rounded-xl focus:border-accent/50 text-white" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -193,11 +193,11 @@ export function ContactForm({ initialData, contactId }: ContactFormProps) {
                   <Label className="text-white">Contact Group</Label>
                   <Select onValueChange={field.onChange} defaultValue={field.value || 'none'} disabled={loadingGroups}>
                     <FormControl>
-                      <SelectTrigger className="rounded-xl border-slate-200">
+                      <SelectTrigger className="bg-black/20 border-white/10 rounded-xl text-white">
                         <SelectValue placeholder="Select a group (optional)" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="rounded-xl">
+                    <SelectContent className="bg-popover border-white/10 text-white rounded-xl">
                       <SelectItem value="none">No Group</SelectItem>
                       {contactGroups.map((group) => (
                         <SelectItem key={group.id} value={group.id} className="rounded-lg">
@@ -211,10 +211,18 @@ export function ContactForm({ initialData, contactId }: ContactFormProps) {
                 </FormItem>
               )}
             />
-            <div className="pt-2 flex flex-col sm:flex-row gap-3">
+            <div className="pt-4 flex items-center justify-end gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="border-white/10 hover:bg-white/5 text-white"
+                onClick={() => router.back()}
+                disabled={form.formState.isSubmitting || loadingGroups}
+              >
+                Cancel
+              </Button>
               <Button 
                 type="submit" 
-                className="flex-grow rounded-xl bg-blue-600 hover:bg-blue-700 shadow-sm transition-all active:scale-95" 
                 disabled={form.formState.isSubmitting || loadingGroups}
               >
                 {form.formState.isSubmitting
@@ -222,14 +230,6 @@ export function ContactForm({ initialData, contactId }: ContactFormProps) {
                   : contactId
                   ? 'Update Contact'
                   : 'Create Contact'}
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="rounded-xl border-slate-200"
-                onClick={() => router.back()}
-              >
-                Cancel
               </Button>
             </div>
           </form>

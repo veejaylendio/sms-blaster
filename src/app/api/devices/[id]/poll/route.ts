@@ -23,6 +23,15 @@ export async function GET(
   const supabase = await createClient();
 
   try {
+    // Update device status and last_seen_at
+    await supabase
+      .from('android_devices')
+      .update({
+        status: 'online',
+        last_seen_at: new Date().toISOString(),
+      })
+      .eq('id', devicePk);
+
     // Fetch pending SMS messages for this device primary key
     const { data: messagesToSend, error: fetchError } = await supabase
       .from('sms_messages')

@@ -21,6 +21,16 @@ export async function POST(
   }
 
   const supabase = await createClient();
+
+  // Update device status and last_seen_at as it's active
+  await supabase
+    .from('android_devices')
+    .update({
+      status: 'online',
+      last_seen_at: new Date().toISOString(),
+    })
+    .eq('id', devicePk);
+
   const updates: Array<{
     sms_id: string;
     status: string;
