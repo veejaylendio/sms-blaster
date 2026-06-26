@@ -70,15 +70,17 @@ export async function processPendingMessages() {
           throw new Error(response.description || 'Mymobkit failed to send');
         }
       } catch (err: any) {
+        const cause = err.cause ? ` (cause: ${err.cause.code || err.cause.message || err.cause})` : '';
+        const errorMsg = `${err.message}${cause}`;
         console.error(`Failed to send message ${msg.id} via mymobkit:`, err);
         await supabase
           .from('sms_messages')
           .update({
             status: 'failed',
-            failure_reason: err.message
+            failure_reason: errorMsg
           })
           .eq('id', msg.id);
-        return { id: msg.id, success: false, error: err.message };
+        return { id: msg.id, success: false, error: errorMsg };
       }
     })
   );

@@ -47,7 +47,7 @@ export async function checkAndUpdateDeviceStatuses(supabase: SupabaseClient, use
     let newLastSeen = device.last_seen_at;
 
     if (device.device_type === 'mymobkit') {
-      const gatewayUrl = device.gateway_url || process.env.ANDROID_SMS_API_URL;
+      const gatewayUrl = process.env.ANDROID_SMS_API_URL || device.gateway_url;
       if (!gatewayUrl) {
         newStatus = 'offline';
       } else {

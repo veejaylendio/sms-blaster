@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
   Users, 
+  UsersRound,
   MessageSquare, 
   Smartphone, 
   LogOut,
@@ -45,6 +46,7 @@ export default function DashboardLayout({
   const navItems = [
     { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { label: 'Contacts', href: '/dashboard/contacts', icon: Users },
+    { label: 'Contact Groups', href: '/dashboard/contact-groups', icon: UsersRound },
     { label: 'Bulk SMS', href: '/dashboard/bulk-sms', icon: MessageSquare },
     { label: 'Devices', href: '/dashboard/devices', icon: Smartphone },
   ];
@@ -68,7 +70,7 @@ export default function DashboardLayout({
         
         <nav className="flex-grow px-4 mt-8 space-y-2">
           {navItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = item.href === '/dashboard' ? pathname === item.href : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
