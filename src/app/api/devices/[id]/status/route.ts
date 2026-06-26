@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyDeviceApiKey } from '@/lib/sms/auth';
 
 export async function POST(
@@ -20,16 +20,20 @@ export async function POST(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // Update device status and last_seen_at as it's active
-  await supabase
+  const { error: deviceUpdateError } = await supabase
     .from('android_devices')
     .update({
       status: 'online',
       last_seen_at: new Date().toISOString(),
     })
     .eq('id', devicePk);
+
+  if (deviceUpdateError) {
+    console.error('Error updating device status on callback:', deviceUpdateError);
+  }
 
   const updates: Array<{
     sms_id: string;

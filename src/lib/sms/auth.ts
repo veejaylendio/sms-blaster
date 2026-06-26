@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import crypto from 'crypto';
 
 export async function verifyDeviceApiKey(
   deviceId: string,
   apiKey: string
 ): Promise<{ isValid: boolean; userId: string | null; devicePk: string | null }> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const hashedApiKey = crypto.createHash('sha256').update(apiKey).digest('hex');
 
   const { data: device, error } = await supabase

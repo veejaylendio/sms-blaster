@@ -1,4 +1,33 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import net from 'net';
+
+function checkTcpConnectivity(host: string, port: number, timeoutMs: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host, port });
+    let settled = false;
+
+    const timer = setTimeout(() => {
+      if (!settled) { settled = true; socket.destroy(); resolve(false); }
+    }, timeoutMs);
+
+    socket.on('connect', () => {
+      if (!settled) { settled = true; clearTimeout(timer); socket.destroy(); resolve(true); }
+    });
+
+    socket.on('error', () => {
+      if (!settled) { settled = true; clearTimeout(timer); socket.destroy(); resolve(false); }
+    });
+  });
+}
+
+function parseUrl(url: string): { host: string; port: number } | null {
+  try {
+    const u = new URL(url);
+    return { host: u.hostname, port: parseInt(u.port) || 80 };
+  } catch {
+    return null;
+  }
+}
 
 export async function checkAndUpdateDeviceStatuses(supabase: SupabaseClient, userId: string) {
   // Fetch devices from DB
@@ -18,36 +47,27 @@ export async function checkAndUpdateDeviceStatuses(supabase: SupabaseClient, use
     let newLastSeen = device.last_seen_at;
 
     if (device.device_type === 'mymobkit') {
-      if (!device.gateway_url) {
+      const gatewayUrl = device.gateway_url || process.env.ANDROID_SMS_API_URL;
+      if (!gatewayUrl) {
         newStatus = 'offline';
       } else {
-        try {
-          // Attempt to ping the mymobkit gateway URL
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
-          
-          // Clean the gateway URL (remove trailing slash)
-          const gatewayUrl = device.gateway_url.replace(/\/$/, '');
-          
-          // Fetch mymobkit gateway. If we get any response, it means it is online.
-          const response = await fetch(gatewayUrl, {
-            method: 'GET',
-            signal: controller.signal,
-            cache: 'no-store',
-          });
-          
-          clearTimeout(timeoutId);
-          
-          // If response is successful or we at least connected (status < 500)
-          if (response.ok || response.status < 500) {
+        const cleanGatewayUrl = gatewayUrl.replace(/\/$/, '');
+        const parsed = parseUrl(cleanGatewayUrl);
+        if (!parsed) {
+          newStatus = 'offline';
+        } else {
+          const startTime = Date.now();
+          const reachable = await checkTcpConnectivity(parsed.host, parsed.port, 5000);
+          const elapsed = Date.now() - startTime;
+
+          if (reachable) {
             newStatus = 'online';
             newLastSeen = now.toISOString();
+            console.log(`[health] ${cleanGatewayUrl} -> reachable (${elapsed}ms) -> ${newStatus}`);
           } else {
             newStatus = 'offline';
+            console.log(`[health] ${cleanGatewayUrl} -> unreachable (${elapsed}ms) -> ${newStatus}`);
           }
-        } catch {
-          // If fetch fails (timeout, connection refused, etc.), it is offline
-          newStatus = 'offline';
         }
       }
     } else {

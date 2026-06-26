@@ -48,11 +48,12 @@ CREATE TABLE public.android_devices (
   device_name text NOT NULL,
   device_id text NOT NULL UNIQUE, -- Unique ID from Android device
   last_seen_at timestamptz,
-  status text DEFAULT 'offline' NOT NULL, -- 'online', 'offline', 'unavailable'
+  status text DEFAULT 'offline' NOT NULL, -- 'online', 'offline', 'unavailable', 'pending'
   api_key_hash text NOT NULL, -- Hashed API key for device authentication
   device_type text DEFAULT 'native' NOT NULL, -- 'native' or 'mymobkit'
   gateway_url text, -- URL for mymobkit push API
-  CONSTRAINT unique_device_id_per_user UNIQUE (user_id, device_id)
+  CONSTRAINT unique_device_id_per_user UNIQUE (user_id, device_id),
+  CONSTRAINT valid_device_status CHECK (status IN ('online', 'offline', 'unavailable', 'pending'))
 );
 ALTER TABLE public.android_devices ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage their own android devices." ON public.android_devices
@@ -87,13 +88,13 @@ CREATE TABLE public.sms_messages (
   contact_id uuid REFERENCES public.contacts (id) ON DELETE CASCADE NOT NULL,
   android_device_id uuid REFERENCES public.android_devices (id) ON DELETE SET NULL,
   message_content text NOT NULL,
-  status text DEFAULT 'pending' NOT NULL, -- 'pending', 'sent', 'failed', 'delivered', 'read'
+  status text DEFAULT 'pending' NOT NULL, -- 'pending', 'sending', 'sent', 'failed', 'delivered', 'read'
   scheduled_send_at timestamptz NOT NULL, -- When it was supposed to be sent
   actual_send_at timestamptz, -- When it was actually sent by the device
   delivery_report jsonb,
   failure_reason text,
   retry_count integer DEFAULT 0 NOT NULL,
-  CONSTRAINT valid_sms_status CHECK (status IN ('pending', 'sent', 'failed', 'delivered', 'read'))
+  CONSTRAINT valid_sms_status CHECK (status IN ('pending', 'sending', 'sent', 'failed', 'delivered', 'read'))
 );
 ALTER TABLE public.sms_messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own sms messages." ON public.sms_messages
@@ -102,3 +103,13 @@ CREATE POLICY "Allow devices to update status." ON public.sms_messages
   FOR UPDATE USING (EXISTS (SELECT 1 FROM public.android_devices WHERE android_devices.id = sms_messages.android_device_id AND android_devices.user_id = auth.uid()));
 CREATE POLICY "Users can insert their own sms messages via campaigns." ON public.sms_messages
   FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM public.contacts WHERE contacts.id = sms_messages.contact_id AND contacts.user_id = auth.uid()));
+
+-- Indexes for hot filter columns
+CREATE INDEX idx_sms_messages_status ON public.sms_messages (status);
+CREATE INDEX idx_sms_messages_android_device_id ON public.sms_messages (android_device_id);
+CREATE INDEX idx_sms_messages_contact_id ON public.sms_messages (contact_id);
+CREATE INDEX idx_android_devices_device_id ON public.android_devices (device_id);
+CREATE INDEX idx_android_devices_user_id_status ON public.android_devices (user_id, status);
+
+-- Enable realtime broadcasts for sms_messages
+ALTER PUBLICATION supabase_realtime ADD TABLE public.sms_messages;
