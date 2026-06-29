@@ -10,7 +10,8 @@ SMS Blaster allows you to send bulk SMS messages to your contacts using your own
 ## 2. Managing Contacts
 ### Adding Contacts
 - Navigate to **Contacts** > **Add Contact**.
-- Enter the contact's name and phone number (including country code).
+- Enter the contact's first name, last name, and phone number (including country code).
+- Optionally set their birthday.
 - Assign them to a group if needed.
 
 ### Contact Groups

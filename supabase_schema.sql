@@ -30,7 +30,9 @@ CREATE TABLE public.contacts (
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
   user_id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
-  name text NOT NULL,
+  first_name text NOT NULL,
+  last_name text,
+  birthday date,
   phone_number text NOT NULL,
   group_id uuid REFERENCES public.contact_groups (id) ON DELETE SET NULL,
   CONSTRAINT unique_phone_per_user UNIQUE (user_id, phone_number)

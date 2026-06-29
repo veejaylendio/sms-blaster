@@ -16,7 +16,8 @@ interface RecentMessageItem {
   status: string;
   created_at: string;
   contacts: {
-    name: string;
+    first_name: string;
+    last_name: string | null;
     phone_number: string;
     user_id: string;
   } | null;
@@ -78,7 +79,7 @@ export default async function DashboardPage() {
       message_content,
       status,
       created_at,
-      contacts!inner (name, phone_number, user_id),
+      contacts!inner (first_name, last_name, phone_number, user_id),
       android_devices (device_name)
     `)
     .eq('contacts.user_id', user.id)
@@ -138,7 +139,7 @@ export default async function DashboardPage() {
                     <tr key={msg.id} className="hover:bg-white/5 transition-colors group">
                       <td className="px-6 py-4">
                         <p className="font-medium text-white group-hover:text-accent transition-colors">
-                          {msg.contacts?.name || 'Unknown'}
+                          {`${msg.contacts?.first_name || ''} ${msg.contacts?.last_name || ''}`.trim() || 'Unknown'}
                         </p>
                         <p className="text-[10px] text-text-muted">
                           {msg.contacts?.phone_number}

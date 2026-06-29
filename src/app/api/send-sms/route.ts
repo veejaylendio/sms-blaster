@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     // 2. Resolve contacts to message
     let contactsQuery = supabase
       .from('contacts')
-      .select('id, name, phone_number')
+      .select('id, first_name, last_name, phone_number')
       .eq('user_id', user.id);
 
     if (sendToType === 'group') {

@@ -34,6 +34,9 @@ Logical grouping of contacts for targeted campaigns.
 ### `contacts`
 Individual contact records.
 - `user_id`: UUID
+- `first_name`: Text
+- `last_name`: Text (optional)
+- `birthday`: Date (optional)
 - `phone_number`: Text (Unique per user)
 - `group_id`: UUID (FK to contact_groups)
 

@@ -36,7 +36,8 @@ import {
 
 interface Contact {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string | null;
   phone_number: string;
   group_id: string | null;
 }
@@ -53,7 +54,8 @@ interface SmsMessage {
   status: string;
   failure_reason: string | null;
   contacts: {
-    name: string;
+    first_name: string;
+    last_name: string | null;
     phone_number: string;
   };
   android_devices: {
@@ -87,9 +89,9 @@ export default function BulkSmsPage() {
       // 1. Fetch Contacts
       const { data: contactsData } = await supabase
         .from('contacts')
-        .select('id, name, phone_number, group_id')
+        .select('id, first_name, last_name, phone_number, group_id')
         .eq('user_id', user.id)
-        .order('name', { ascending: true });
+        .order('first_name', { ascending: true });
       setContacts(contactsData || []);
 
       // 2. Fetch Contact Groups
@@ -124,7 +126,7 @@ export default function BulkSmsPage() {
           message_content,
           status,
           failure_reason,
-          contacts!inner (name, phone_number, user_id),
+          contacts!inner (first_name, last_name, phone_number, user_id),
           android_devices (device_name)
         `)
         .eq('contacts.user_id', user.id)
@@ -146,10 +148,13 @@ export default function BulkSmsPage() {
   }, [supabase]);
 
   // Handle contact search filtering for manual select list
-  const filteredContactsList = contacts.filter(c =>
-    c.name.toLowerCase().includes(contactSearchQuery.toLowerCase()) ||
-    c.phone_number.includes(contactSearchQuery)
-  );
+  const filteredContactsList = contacts.filter(c => {
+    const fullName = `${c.first_name} ${c.last_name || ''}`.trim().toLowerCase();
+    return (
+      fullName.includes(contactSearchQuery.toLowerCase()) ||
+      c.phone_number.includes(contactSearchQuery)
+    );
+  });
 
   const toggleContactSelection = (contactId: string) => {
     setSelectedContactIds(prev =>
@@ -359,13 +364,13 @@ export default function BulkSmsPage() {
                       filteredContactsList.map((contact) => {
                         const isSelected = selectedContactIds.includes(contact.id);
                         return (
-                          <div 
+                          <div
                             key={contact.id}
                             onClick={() => toggleContactSelection(contact.id)}
                             className="flex items-center justify-between p-2 px-3 hover:bg-white/5 cursor-pointer transition-colors group"
                           >
                             <div>
-                              <p className="text-xs font-semibold text-white group-hover:text-accent transition-colors">{contact.name}</p>
+                              <p className="text-xs font-semibold text-white group-hover:text-accent transition-colors">{`${contact.first_name} ${contact.last_name || ''}`.trim()}</p>
                               <p className="text-[10px] text-text-muted font-mono">{contact.phone_number}</p>
                             </div>
                             <div className={`w-4 h-4 rounded border transition-all flex items-center justify-center ${
@@ -452,7 +457,7 @@ export default function BulkSmsPage() {
                     {messages.map((msg) => (
                       <TableRow key={msg.id} className="hover:bg-white/5 group transition-colors border-b border-white/[0.02]">
                         <TableCell className="py-3">
-                          <p className="font-semibold text-white group-hover:text-accent transition-colors">{msg.contacts?.name || 'Unknown'}</p>
+                          <p className="font-semibold text-white group-hover:text-accent transition-colors">{`${msg.contacts?.first_name || ''} ${msg.contacts?.last_name || ''}`.trim() || 'Unknown'}</p>
                           <p className="text-[10px] text-text-muted font-mono">{msg.contacts?.phone_number}</p>
                         </TableCell>
                         <TableCell className="max-w-[150px] truncate text-xs text-text-muted italic group-hover:text-white/80 transition-colors">

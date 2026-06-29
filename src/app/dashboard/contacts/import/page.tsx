@@ -42,14 +42,17 @@ export default function ImportContactsPage() {
         return;
       }
 
-      // Basic CSV parsing (assuming header: name, phone, group)
+      // Basic CSV parsing (assuming header: first_name, last_name, phone, group, birthday)
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const firstNameIdx = headers.indexOf('first_name');
+      const lastNameIdx = headers.indexOf('last_name');
       const nameIdx = headers.indexOf('name');
       const phoneIdx = headers.indexOf('phone');
       const groupIdx = headers.indexOf('group');
+      const birthdayIdx = headers.indexOf('birthday');
 
-      if (nameIdx === -1 || phoneIdx === -1) {
-        toast.error('CSV must have "name" and "phone" columns.');
+      if ((firstNameIdx === -1 && nameIdx === -1) || phoneIdx === -1) {
+        toast.error('CSV must have "first_name" (or "name") and "phone" columns.');
         setImporting(false);
         return;
       }
@@ -70,14 +73,16 @@ export default function ImportContactsPage() {
         if (!line) continue;
 
         const values = line.split(',').map(v => v.trim());
-        const name = values[nameIdx];
+        const firstName = firstNameIdx !== -1 ? values[firstNameIdx] : nameIdx !== -1 ? values[nameIdx] : '';
+        const lastName = lastNameIdx !== -1 ? values[lastNameIdx] : null;
         const phone = values[phoneIdx];
         const groupName = groupIdx !== -1 ? values[groupIdx] : null;
+        const birthday = birthdayIdx !== -1 ? values[birthdayIdx] || null : null;
 
-        if (name && phone) {
+        if (firstName && phone) {
           const { isValid, normalized } = validateAndNormalizePhoneNumber(phone);
           if (isValid && normalized) {
-            contactsToInsert.push({ name, phone_number: normalized, groupName });
+            contactsToInsert.push({ firstName, lastName, phone_number: normalized, groupName, birthday });
             if (groupName) groupsToCreate.add(groupName);
           } else {
             invalidCount++;
@@ -122,7 +127,9 @@ export default function ImportContactsPage() {
         // 2. Insert Contacts
         const finalContacts = contactsToInsert.map(c => ({
           user_id: user.id,
-          name: c.name,
+          first_name: c.firstName,
+          last_name: c.lastName,
+          birthday: c.birthday,
           phone_number: c.phone_number,
           group_id: c.groupName ? groupMap[c.groupName] : null
         }));
@@ -155,7 +162,7 @@ export default function ImportContactsPage() {
         <CardHeader>
           <CardTitle>Import Contacts</CardTitle>
           <CardDescription>
-            Upload a CSV file with "name", "phone", and optionally "group" columns.
+            Upload a CSV file with &quot;first_name&quot;, &quot;phone&quot;, and optionally &quot;last_name&quot;, &quot;birthday&quot;, and &quot;group&quot; columns.
           </CardDescription>
         </CardHeader>
         <CardContent>

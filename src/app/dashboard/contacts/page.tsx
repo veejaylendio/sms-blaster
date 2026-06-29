@@ -36,9 +36,11 @@ import { Input } from '@/components/ui/input';
 
 interface Contact {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string | null;
+  birthday: string | null;
   phone_number: string;
-  contact_groups: { name: string }[] | null;
+  contact_group_memberships: { contact_groups: { name: string } | null }[] | null;
 }
 
 function DeleteContactButton({ contactId, onDelete }: { contactId: string, onDelete: () => void }) {
@@ -100,9 +102,9 @@ export default function ContactsPage() {
 
       const { data, error } = await supabase
         .from('contacts')
-        .select('id, name, phone_number, contact_groups(name)')
+        .select('id, first_name, last_name, birthday, phone_number, contact_group_memberships(contact_groups(name))')
         .eq('user_id', user.id)
-        .order('name', { ascending: true });
+        .order('first_name', { ascending: true });
 
       if (error) {
         console.error('Error fetching contacts:', error);
@@ -115,10 +117,13 @@ export default function ContactsPage() {
     fetchContacts();
   }, [supabase]);
 
-  const filteredContacts = contacts.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    c.phone_number.includes(searchQuery)
-  );
+  const filteredContacts = contacts.filter(c => {
+    const fullName = `${c.first_name} ${c.last_name || ''}`.trim().toLowerCase();
+    return (
+      fullName.includes(searchQuery.toLowerCase()) ||
+      c.phone_number.includes(searchQuery)
+    );
+  });
 
   return (
     <div className="space-y-8">
@@ -170,43 +175,63 @@ export default function ContactsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredContacts.map((contact) => (
-                  <TableRow key={contact.id} className="group">
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full border border-accent/30 bg-accent/5 flex items-center justify-center text-accent text-xs font-bold shadow-[0_0_10px_rgba(66,245,230,0.1)] group-hover:shadow-[0_0_15px_rgba(66,245,230,0.3)] transition-all">
-                          {contact.name.charAt(0).toUpperCase()}
+                {filteredContacts.map((contact) => {
+                  const fullName = `${contact.first_name} ${contact.last_name || ''}`.trim();
+                  return (
+                    <TableRow key={contact.id} className="group">
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full border border-accent/30 bg-accent/5 flex items-center justify-center text-accent text-xs font-bold shadow-[0_0_10px_rgba(66,245,230,0.1)] group-hover:shadow-[0_0_15px_rgba(66,245,230,0.3)] transition-all">
+                            {contact.first_name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-medium text-white group-hover:text-accent transition-colors">{fullName}</span>
                         </div>
-                        <span className="font-medium text-white group-hover:text-accent transition-colors">{contact.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-text-muted group-hover:text-white transition-colors">{contact.phone_number}</TableCell>
-                    <TableCell>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                        contact.contact_groups?.[0]?.name 
-                          ? 'bg-accent/10 text-accent border-accent/20' 
-                          : 'bg-white/5 text-text-muted border-white/10'
-                      }`}>
-                        {contact.contact_groups?.[0]?.name || 'No Group'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end items-center space-x-1">
-                        <Button variant="ghost" size="icon" className="text-text-muted hover:text-accent hover:bg-accent/10" asChild>
-                          <Link href={`/dashboard/contacts/${contact.id}/edit`}>
-                            <Edit2 className="w-4 h-4" />
-                          </Link>
-                        </Button>
-                        <DeleteContactButton 
-                          contactId={contact.id} 
-                          onDelete={() => {
-                            setContacts(prev => prev.filter(c => c.id !== contact.id));
-                          }}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell className="text-text-muted group-hover:text-white transition-colors">{contact.phone_number}</TableCell>
+                      <TableCell>
+                        {(() => {
+                          const groupNames = (contact.contact_group_memberships ?? [])
+                            .map((m) => m.contact_groups?.name)
+                            .filter(Boolean) as string[];
+                          if (groupNames.length === 0) {
+                            return (
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-white/5 text-text-muted border-white/10">
+                                No Group
+                              </span>
+                            );
+                          }
+                          return (
+                            <div className="flex flex-wrap gap-1">
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-accent/10 text-accent border-accent/20">
+                                {groupNames[0]}
+                              </span>
+                              {groupNames.length > 1 && (
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-white/5 text-text-muted border-white/10">
+                                  +{groupNames.length - 1} more
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end items-center space-x-1">
+                          <Button variant="ghost" size="icon" className="text-text-muted hover:text-accent hover:bg-accent/10" asChild>
+                            <Link href={`/dashboard/contacts/${contact.id}/edit`}>
+                              <Edit2 className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                          <DeleteContactButton
+                            contactId={contact.id}
+                            onDelete={() => {
+                              setContacts(prev => prev.filter(c => c.id !== contact.id));
+                            }}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

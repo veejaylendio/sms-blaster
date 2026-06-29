@@ -14,12 +14,12 @@ export default async function EditContactPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    notFound(); // Should be protected by layout, but as a fallback
+    notFound();
   }
 
   const { data: contact, error } = await supabase
     .from('contacts')
-    .select('id, name, phone_number, group_id')
+    .select('id, first_name, last_name, birthday, phone_number')
     .eq('id', id)
     .eq('user_id', user.id)
     .single();
@@ -29,10 +29,17 @@ export default async function EditContactPage({
     notFound();
   }
 
+  const { data: memberships } = await supabase
+    .from('contact_group_memberships')
+    .select('group_id')
+    .eq('contact_id', id);
+
   const initialData = {
-    name: contact.name,
+    first_name: contact.first_name,
+    last_name: contact.last_name,
+    birthday: contact.birthday,
     phone_number: contact.phone_number,
-    group_id: contact.group_id,
+    group_ids: (memberships ?? []).map((m: { group_id: string }) => m.group_id),
   };
 
   return (
