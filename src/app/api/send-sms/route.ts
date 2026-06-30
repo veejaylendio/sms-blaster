@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { processPendingMessages } from '@/lib/sms/processor';
 import { checkAndUpdateDeviceStatuses } from '@/lib/sms/device-status';
+import { resolveMergeTags, MERGE_FIELDS, type MergeableContact } from '@/lib/sms/merge-tags';
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     // 2. Resolve contacts to message
     let contactsQuery = supabase
       .from('contacts')
-      .select('id, first_name, last_name, phone_number')
+      .select('id, first_name, last_name, phone_number, birthday')
       .eq('user_id', user.id);
 
     if (sendToType === 'group') {
@@ -83,7 +84,11 @@ export async function POST(req: NextRequest) {
       return {
         contact_id: contact.id,
         android_device_id: assignedDevice.id,
-        message_content: messageContent,
+        message_content: resolveMergeTags(
+          messageContent,
+          contact as unknown as MergeableContact,
+          MERGE_FIELDS
+        ),
         status: 'pending',
         scheduled_send_at: new Date().toISOString(),
       };

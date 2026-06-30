@@ -6,14 +6,6 @@ import { useSupabase } from '@/components/supabase-provider'; // Import useSupab
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -126,29 +118,37 @@ export default function ContactGroupsPage() {
       </div>
 
       {contactGroups && contactGroups.length > 0 ? (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Group Name</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {contactGroups.map((group) => (
-              <TableRow key={group.id}>
-                <TableCell className="font-medium">{group.name}</TableCell>
-                <TableCell>{new Date(group.created_at).toLocaleDateString()}</TableCell>
-                <TableCell className="text-right flex justify-end space-x-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/dashboard/contact-groups/${group.id}/edit`}>Edit</Link>
-                  </Button>
-                  <DeleteContactGroupButton groupId={group.id} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="rounded-md border overflow-hidden">
+          <table className="w-full caption-bottom text-sm">
+            <thead className="[&_tr]:border-b">
+              <tr className="border-b transition-colors hover:bg-muted/50">
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Group Name</th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Created At</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+          </table>
+          <div className="overflow-y-auto" style={{ maxHeight: "calc(5 * 3.25rem)" }}>
+            <table className="w-full caption-bottom text-sm">
+              <tbody className="[&_tr:last-child]:border-0">
+                {contactGroups.map((group) => (
+                  <tr key={group.id} className="border-b transition-colors hover:bg-muted/50">
+                    <td className="p-4 align-middle font-medium">{group.name}</td>
+                    <td className="p-4 align-middle">{new Date(group.created_at).toLocaleDateString()}</td>
+                    <td className="p-4 align-middle">
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/contact-groups/${group.id}/edit`}>Edit</Link>
+                        </Button>
+                        <DeleteContactGroupButton groupId={group.id} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : (
         <p>No contact groups found. Create your first group!</p>
       )}

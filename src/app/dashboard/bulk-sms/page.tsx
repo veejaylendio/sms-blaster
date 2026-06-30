@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSupabase } from '@/components/supabase-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
   Table,
@@ -22,17 +21,26 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { 
-  Send, 
-  Users, 
-  RefreshCw, 
-  AlertCircle, 
-  CheckCircle2, 
-  Clock, 
+import {
+  Send,
+  Users,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
   Search,
   Check,
-  MessageSquare
+  MessageSquare,
+  Tag,
 } from 'lucide-react';
+import { MergeTagComposer, type MergeTagComposerHandle } from '@/components/sms/merge-tag-composer';
+import {
+  MERGE_FIELDS,
+  extractUnknownTags,
+  getEffectiveText,
+  resolveForPreview,
+  type MergeableContact,
+} from '@/lib/sms/merge-tags';
 
 interface Contact {
   id: string;
@@ -40,6 +48,7 @@ interface Contact {
   last_name: string | null;
   phone_number: string;
   group_id: string | null;
+  birthday: string | null;
 }
 
 interface ContactGroup {
@@ -78,6 +87,9 @@ export default function BulkSmsPage() {
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
   const [messageContent, setMessageContent] = useState('');
   const [contactSearchQuery, setContactSearchQuery] = useState('');
+  const composerRef = useRef<MergeTagComposerHandle>(null);
+  const [insertFieldKey, setInsertFieldKey] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
 
   // Fetch initial data
   const fetchData = async () => {
@@ -89,7 +101,7 @@ export default function BulkSmsPage() {
       // 1. Fetch Contacts
       const { data: contactsData } = await supabase
         .from('contacts')
-        .select('id, first_name, last_name, phone_number, group_id')
+        .select('id, first_name, last_name, phone_number, group_id, birthday')
         .eq('user_id', user.id)
         .order('first_name', { ascending: true });
       setContacts(contactsData || []);
@@ -172,6 +184,11 @@ export default function BulkSmsPage() {
       return;
     }
 
+    if (extractUnknownTags(messageContent).length > 0) {
+      toast.error('Message contains unknown merge tags. Please fix them before sending.');
+      return;
+    }
+
     if (sendToType === 'group' && !selectedGroupId) {
       toast.error('Please select a contact group');
       return;
@@ -251,10 +268,23 @@ export default function BulkSmsPage() {
     }
   };
 
-  // SMS character count logic
+  // SMS character count logic — effective length replaces each merge tag with its fallback value
   const charLimit = 160;
-  const charsUsed = messageContent.length;
+  const effectiveContent = useMemo(() => getEffectiveText(messageContent), [messageContent]);
+  const charsUsed = effectiveContent.length;
   const smsCount = Math.ceil(charsUsed / charLimit) || 1;
+
+  const unknownTags = useMemo(() => extractUnknownTags(messageContent), [messageContent]);
+  const hasUnknownTags = unknownTags.length > 0;
+
+  const previewSegments = useMemo(
+    () =>
+      resolveForPreview(
+        messageContent,
+        contacts.length > 0 ? (contacts[0] as unknown as MergeableContact) : null
+      ),
+    [messageContent, contacts]
+  );
 
   if (loadingData) {
     return (
@@ -269,9 +299,9 @@ export default function BulkSmsPage() {
         <p className="text-text-muted text-sm mt-1">Compose and send instant broadcasts directly through your Android devices.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        {/* Left compose panel */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="space-y-8">
+        {/* Compose panel */}
+        <div className="space-y-6">
           <div className="glass-card p-6 border-white/5 bg-white/2">
             <h2 className="text-lg font-semibold text-white mb-4">Compose Blast</h2>
             
@@ -390,6 +420,36 @@ export default function BulkSmsPage() {
                 </div>
               )}
 
+              {/* Insert field control + preview toggle */}
+              <div className="flex items-center justify-between gap-2">
+                <Select
+                  value={insertFieldKey}
+                  onValueChange={(v) => {
+                    setInsertFieldKey('');
+                    composerRef.current?.insertTag(v);
+                  }}
+                >
+                  <SelectTrigger className="bg-black/20 border-white/10 text-white rounded-xl h-8 text-xs">
+                    <Tag className="w-3.5 h-3.5 text-accent" />
+                    <SelectValue placeholder="Insert Field" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-white/10 text-white rounded-xl">
+                    {MERGE_FIELDS.map((field) => (
+                      <SelectItem key={field.key} value={field.key} className="rounded-lg">
+                        {field.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <button
+                  type="button"
+                  onClick={() => setShowPreview((s) => !s)}
+                  className="text-[10px] uppercase tracking-wider text-accent hover:underline font-bold"
+                >
+                  {showPreview ? 'Hide preview' : 'Preview with sample contact'}
+                </button>
+              </div>
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="messageBox" className="text-white">SMS Message</Label>
@@ -397,22 +457,46 @@ export default function BulkSmsPage() {
                     {charsUsed} chars / {smsCount} SMS
                   </span>
                 </div>
-                <Textarea
+                <MergeTagComposer
+                  ref={composerRef}
                   id="messageBox"
-                  placeholder="Enter message content here..."
-                  rows={5}
                   value={messageContent}
-                  onChange={(e) => setMessageContent(e.target.value)}
-                  className="bg-black/20 border-white/10 text-sm rounded-xl focus:border-accent/50 placeholder:text-text-muted/65"
-                  required
+                  onChange={setMessageContent}
+                  aria-label="SMS Message"
                 />
+                {hasUnknownTags && (
+                  <div className="flex items-start gap-1.5 text-[11px] text-amber-400">
+                    <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                    <span>
+                      Unknown merge tag{unknownTags.length > 1 ? 's' : ''}:{' '}
+                      {unknownTags.map((t) => `{{${t}}}`).join(', ')}. Check your spelling.
+                    </span>
+                  </div>
+                )}
+                {showPreview && (
+                  <div className="rounded-lg bg-black/20 border border-white/5 p-3 text-xs text-text-muted leading-relaxed break-words whitespace-pre-wrap">
+                    {messageContent.trim() === '' ? (
+                      <span className="italic">Nothing to preview yet.</span>
+                    ) : (
+                      previewSegments.map((seg, i) =>
+                        seg.unknown ? (
+                          <span key={i} className="text-red-400 font-semibold bg-red-400/10 rounded px-0.5">
+                            {seg.text}
+                          </span>
+                        ) : (
+                          <span key={i}>{seg.text}</span>
+                        )
+                      )
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="pt-2">
                 <Button 
                   type="submit" 
                   className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_20px_rgba(66,245,230,0.3)] h-11 text-sm font-bold rounded-xl"
-                  disabled={sending}
+                  disabled={sending || hasUnknownTags}
                 >
                   <Send className="w-4 h-4 mr-2" />
                   {sending ? 'Sending Blast...' : 'Send SMS Blast'}
@@ -422,9 +506,9 @@ export default function BulkSmsPage() {
           </div>
         </div>
 
-        {/* Right log panel */}
-        <div className="lg:col-span-3">
-          <div className="glass-card border-white/5 bg-white/2 overflow-hidden h-full flex flex-col">
+        {/* Broadcast Log */}
+        <div>
+          <div className="glass-card border-white/5 bg-white/2 overflow-hidden flex flex-col">
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/2">
               <div>
                 <h2 className="text-lg font-semibold text-white">Broadcast Log</h2>
@@ -488,7 +572,7 @@ export default function BulkSmsPage() {
                   </div>
                   <h3 className="text-base font-bold text-white">No messages sent yet</h3>
                   <p className="text-text-muted max-w-xs mx-auto mt-1 text-xs">
-                    Compose a blast on the left to start sending bulk messages.
+                    Compose a blast above to start sending bulk messages.
                   </p>
                 </div>
               )}
