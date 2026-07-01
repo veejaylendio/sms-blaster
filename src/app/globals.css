@@ -52,50 +52,50 @@
 }
 
 :root {
-  /* Glassmorphism Defaults (Matching Reference) */
-  --accent: #42f5e6;
-  --accent-glow: rgba(66, 245, 230, 0.3);
-  --glass-bg: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: rgba(0, 0, 0, 0.25);
-  --text-main: #f3f4f6;
+  /* Glassmorphism — New Life Iligan reference palette */
+  --accent: #a896ff;
+  --accent-glow: rgba(168, 150, 255, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shadow: rgba(0, 0, 0, 0.30);
+  --text-main: #f5f5f7;
   --text-muted: #9ca3af;
 
-  /* Force Dark Theme as per requirement */
-  --background: #0f172a; /* Deep Slate */
-  --foreground: #f3f4f6;
-  
-  --card: rgba(255, 255, 255, 0.03);
-  --card-foreground: #f3f4f6;
-  
-  --popover: rgba(15, 23, 42, 0.95);
-  --popover-foreground: #f3f4f6;
-  
-  --primary: #42f5e6;
-  --primary-foreground: #0f172a;
-  
+  /* Force Dark Theme */
+  --background: #0b0f1a;
+  --foreground: #f5f5f7;
+
+  --card: rgba(255, 255, 255, 0.04);
+  --card-foreground: #f5f5f7;
+
+  --popover: rgba(11, 15, 26, 0.95);
+  --popover-foreground: #f5f5f7;
+
+  --primary: #a896ff;
+  --primary-foreground: #1a1530;
+
   --secondary: rgba(255, 255, 255, 0.05);
-  --secondary-foreground: #f3f4f6;
-  
+  --secondary-foreground: #f5f5f7;
+
   --muted: rgba(255, 255, 255, 0.05);
   --muted-foreground: #9ca3af;
-  
-  --accent-foreground: #0f172a;
-  
+
+  --accent-foreground: #1a1530;
+
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  
-  --border: rgba(255, 255, 255, 0.1);
+
+  --border: rgba(255, 255, 255, 0.12);
   --input: rgba(255, 255, 255, 0.05);
-  --ring: #42f5e6;
-  
+  --ring: #a896ff;
+
   --radius: 1rem;
 
   /* Sidebar */
   --sidebar: rgba(0, 0, 0, 0.2);
   --sidebar-foreground: #9ca3af;
-  --sidebar-primary: #42f5e6;
-  --sidebar-primary-foreground: #0f172a;
+  --sidebar-primary: #a896ff;
+  --sidebar-primary-foreground: #1a1530;
   --sidebar-accent: rgba(255, 255, 255, 0.05);
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
@@ -107,7 +107,7 @@
   }
   body {
     @apply bg-background text-foreground min-h-screen relative overflow-x-hidden;
-    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+    background: linear-gradient(135deg, #0b0f1a 0%, #14182b 40%, #1c1430 75%, #261a3d 100%);
   }
   html {
     @apply font-sans;
@@ -121,35 +121,38 @@
   }
   
   .glass-card {
-    @apply bg-white/3 backdrop-blur-lg border border-white/10 rounded-2xl shadow-xl transition-all duration-300;
+    @apply bg-white/5 backdrop-blur-[20px] border border-white/15 rounded-2xl transition-all duration-300;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.10);
   }
-  
+
   .glass-card:hover {
-    @apply border-accent/30 shadow-accent/5 -translate-y-1;
+    @apply border-white/25 -translate-y-1;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
   }
 
   .text-glow {
-    text-shadow: 0 0 10px var(--accent-glow);
+    text-shadow: 0 0 20px rgba(180, 160, 255, 0.35);
   }
-  
+
   .blob {
-    @apply absolute rounded-full blur-[80px] z-0 pointer-events-none;
+    @apply fixed rounded-full z-0 pointer-events-none;
+    filter: blur(90px);
   }
-  
+
   .blob-1 {
-    top: 20%;
-    left: 15%;
-    width: 300px;
-    height: 300px;
-    background: rgba(66, 245, 230, 0.15);
+    top: -120px;
+    left: -120px;
+    width: 420px;
+    height: 420px;
+    background: rgba(255, 255, 255, 0.10);
   }
-  
+
   .blob-2 {
-    bottom: 15%;
-    right: 15%;
-    width: 400px;
-    height: 400px;
-    background: rgba(147, 51, 234, 0.2);
+    bottom: -160px;
+    right: -140px;
+    width: 480px;
+    height: 480px;
+    background: rgba(140, 120, 255, 0.18);
   }
 }
 
@@ -165,5 +168,5 @@
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(66, 245, 230, 0.3);
+  background: rgba(168, 150, 255, 0.3);
 }

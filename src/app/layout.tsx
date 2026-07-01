@@ -10,8 +10,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SMS Blaster | NexusCore",
+  title: "SMS Blaster | New Life Iligan",
   description: "A modern web application for sending bulk SMS blasts.",
+  icons: {
+    icon: "/logo_black.png",
+  },
 };
 
 export default function RootLayout({

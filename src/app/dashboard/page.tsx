@@ -182,14 +182,14 @@ export default async function DashboardPage() {
         <div className="glass-card border-accent/20 bg-accent/5 p-8 flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 blur-3xl -mr-16 -mt-16 group-hover:bg-accent/20 transition-all duration-500"></div>
           <div className="relative z-10">
-            <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center border border-accent/30 mb-6 shadow-[0_0_20px_rgba(66,245,230,0.2)]">
+            <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center border border-accent/30 mb-6 shadow-[0_0_20px_rgba(168,150,255,0.2)]">
               <Send className="w-6 h-6 text-accent text-glow" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-3">Ready to blast?</h3>
             <p className="text-text-muted text-sm leading-relaxed mb-8">
               Reach all your contacts instantly with a bulk SMS blast. All system core protocols are operational.
             </p>
-            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_20px_rgba(66,245,230,0.4)] h-12 text-base font-bold" asChild>
+            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_20px_rgba(168,150,255,0.4)] h-12 text-base font-bold" asChild>
               <Link href="/dashboard/bulk-sms">SEND BULK SMS</Link>
             </Button>
           </div>

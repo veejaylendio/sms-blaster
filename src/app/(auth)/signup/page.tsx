@@ -39,8 +39,12 @@ export default function SignupPage() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground text-glow mb-2">Join NexusCore</h1>
+      <div className="flex flex-col items-center text-center">
+        <div className="w-16 h-16 rounded-2xl bg-accent/5 flex items-center justify-center border border-white/10 overflow-hidden mb-4 shadow-[0_0_20px_rgba(168,150,255,0.15)]">
+          <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground text-glow mb-1">New Life Iligan</h1>
+        <h2 className="text-lg font-medium text-accent mb-2">SMS Blaster</h2>
         <p className="text-text-muted text-sm">Create your account to get started</p>
       </div>
 
@@ -70,7 +74,7 @@ export default function SignupPage() {
         {error && <p className="text-destructive text-sm text-center font-medium">{error}</p>}
         <Button 
           type="submit" 
-          className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(66,245,230,0.3)]" 
+          className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(168,150,255,0.3)]" 
           disabled={loading}
         >
           {loading ? 'Creating Account...' : 'Sign Up'}

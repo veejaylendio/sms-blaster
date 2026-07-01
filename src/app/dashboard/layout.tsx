@@ -59,11 +59,12 @@ export default function DashboardLayout({
       <aside className="hidden md:flex w-[260px] flex-col bg-black/10 backdrop-blur-xl border-r border-white/10 sticky top-0 h-screen z-20">
         <div className="p-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center border border-accent/20 shadow-[0_0_15px_rgba(66,245,230,0.1)]">
-              <LayoutDashboard className="w-6 h-6 text-accent text-glow" />
+            <div className="w-10 h-10 rounded-xl bg-accent/5 flex items-center justify-center border border-white/10 overflow-hidden">
+              <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-white">
-              NEXUS<span className="text-accent">CORE</span>
+            <h1 className="text-lg font-bold tracking-tight text-white leading-none">
+              SMS <span className="text-accent">Blaster</span>
+              <span className="block text-[10px] text-text-muted font-semibold tracking-wider uppercase mt-1">New Life Iligan</span>
             </h1>
           </div>
         </div>
@@ -90,7 +91,7 @@ export default function DashboardLayout({
 
         <div className="p-6 border-t border-white/5 bg-black/5">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full border-2 border-accent shadow-[0_0_10px_rgba(66,245,230,0.3)] bg-accent/10 flex items-center justify-center font-bold text-accent">
+            <div className="w-10 h-10 rounded-full border-2 border-accent shadow-[0_0_10px_rgba(168,150,255,0.3)] bg-accent/10 flex items-center justify-center font-bold text-accent">
               {user.email?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-grow overflow-hidden">
@@ -112,8 +113,10 @@ export default function DashboardLayout({
       {/* Mobile Header */}
       <header className="md:hidden bg-black/20 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <LayoutDashboard className="w-5 h-5 text-accent" />
-          <h1 className="text-lg font-bold text-white tracking-tight">NEXUSCORE</h1>
+          <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
+          <h1 className="text-base font-bold text-white tracking-tight">
+            SMS Blaster <span className="text-xs text-text-muted font-normal ml-1">| New Life Iligan</span>
+          </h1>
         </div>
         <Button variant="ghost" size="icon" className="text-white">
           <Menu className="w-6 h-6" />
@@ -122,22 +125,24 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="flex-grow flex flex-col min-w-0 z-10">
-        <header className="hidden md:flex h-20 items-center justify-between px-10 bg-transparent sticky top-0 z-40">
-          <div>
-            <h1 className="text-2xl font-medium text-white">System Overview</h1>
-            <p className="text-xs text-text-muted">Welcome back, here is your performance current status.</p>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-              <input 
-                type="text" 
-                placeholder="Search parameters..." 
-                className="w-full bg-black/20 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-accent/50 transition-all"
-              />
+        {pathname === '/dashboard' && (
+          <header className="hidden md:flex h-20 items-center justify-between px-10 bg-transparent sticky top-0 z-40">
+            <div>
+              <h1 className="text-2xl font-medium text-white">System Overview</h1>
+              <p className="text-xs text-text-muted">Welcome back, here is your performance current status.</p>
             </div>
-          </div>
-        </header>
+            <div className="flex items-center gap-6">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                <input 
+                  type="text" 
+                  placeholder="Search parameters..." 
+                  className="w-full bg-black/20 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-accent/50 transition-all"
+                />
+              </div>
+            </div>
+          </header>
+        )}
         
         <div className="p-6 md:p-10 md:pt-4">
           {children}

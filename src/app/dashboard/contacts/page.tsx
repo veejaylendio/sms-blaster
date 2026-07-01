@@ -139,7 +139,7 @@ export default function ContactsPage() {
               Import CSV
             </Link>
           </Button>
-          <Button className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(66,245,230,0.3)]" asChild>
+          <Button className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(168,150,255,0.3)]" asChild>
             <Link href="/dashboard/contacts/add">
               <UserPlus className="w-4 h-4 mr-2" />
               Add Contact
@@ -181,7 +181,7 @@ export default function ContactsPage() {
                     <TableRow key={contact.id} className="group">
                       <TableCell>
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-full border border-accent/30 bg-accent/5 flex items-center justify-center text-accent text-xs font-bold shadow-[0_0_10px_rgba(66,245,230,0.1)] group-hover:shadow-[0_0_15px_rgba(66,245,230,0.3)] transition-all">
+                          <div className="w-8 h-8 rounded-full border border-accent/30 bg-accent/5 flex items-center justify-center text-accent text-xs font-bold shadow-[0_0_10px_rgba(168,150,255,0.1)] group-hover:shadow-[0_0_15px_rgba(168,150,255,0.3)] transition-all">
                             {contact.first_name.charAt(0).toUpperCase()}
                           </div>
                           <span className="font-medium text-white group-hover:text-accent transition-colors">{fullName}</span>
@@ -237,7 +237,7 @@ export default function ContactsPage() {
           </div>
         ) : (
           <div className="p-20 text-center">
-            <div className="w-20 h-20 bg-accent/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-accent/10 shadow-[0_0_30px_rgba(66,245,230,0.05)]">
+            <div className="w-20 h-20 bg-accent/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-accent/10 shadow-[0_0_30px_rgba(168,150,255,0.05)]">
               <Users className="w-10 h-10 text-accent/40" />
             </div>
             <h3 className="text-xl font-bold text-white">No contacts found</h3>
@@ -245,7 +245,7 @@ export default function ContactsPage() {
               {searchQuery ? `No results for "${searchQuery}"` : 'Start building your audience by adding or importing contacts.'}
             </p>
             {!searchQuery && (
-              <Button className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(66,245,230,0.3)] px-8" asChild>
+              <Button className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(168,150,255,0.3)] px-8" asChild>
                 <Link href="/dashboard/contacts/add">Add your first contact</Link>
               </Button>
             )}

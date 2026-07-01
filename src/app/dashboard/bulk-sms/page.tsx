@@ -314,7 +314,7 @@ export default function BulkSmsPage() {
                     onClick={() => setSendToType('all_contacts')}
                     className={`py-2 px-3 text-xs font-semibold rounded-xl border transition-all ${
                       sendToType === 'all_contacts'
-                        ? 'bg-accent text-accent-foreground border-accent shadow-[0_0_10px_rgba(66,245,230,0.2)]'
+                        ? 'bg-accent text-accent-foreground border-accent shadow-[0_0_10px_rgba(168,150,255,0.2)]'
                         : 'bg-black/20 border-white/10 text-text-muted hover:text-white hover:bg-white/5'
                     }`}
                   >
@@ -325,7 +325,7 @@ export default function BulkSmsPage() {
                     onClick={() => setSendToType('group')}
                     className={`py-2 px-3 text-xs font-semibold rounded-xl border transition-all ${
                       sendToType === 'group'
-                        ? 'bg-accent text-accent-foreground border-accent shadow-[0_0_10px_rgba(66,245,230,0.2)]'
+                        ? 'bg-accent text-accent-foreground border-accent shadow-[0_0_10px_rgba(168,150,255,0.2)]'
                         : 'bg-black/20 border-white/10 text-text-muted hover:text-white hover:bg-white/5'
                     }`}
                   >
@@ -336,7 +336,7 @@ export default function BulkSmsPage() {
                     onClick={() => setSendToType('multiple_contacts')}
                     className={`py-2 px-3 text-xs font-semibold rounded-xl border transition-all ${
                       sendToType === 'multiple_contacts'
-                        ? 'bg-accent text-accent-foreground border-accent shadow-[0_0_10px_rgba(66,245,230,0.2)]'
+                        ? 'bg-accent text-accent-foreground border-accent shadow-[0_0_10px_rgba(168,150,255,0.2)]'
                         : 'bg-black/20 border-white/10 text-text-muted hover:text-white hover:bg-white/5'
                     }`}
                   >
@@ -495,7 +495,7 @@ export default function BulkSmsPage() {
               <div className="pt-2">
                 <Button 
                   type="submit" 
-                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_20px_rgba(66,245,230,0.3)] h-11 text-sm font-bold rounded-xl"
+                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_20px_rgba(168,150,255,0.3)] h-11 text-sm font-bold rounded-xl"
                   disabled={sending || hasUnknownTags}
                 >
                   <Send className="w-4 h-4 mr-2" />

@@ -59,7 +59,18 @@ export async function POST(req: NextRequest) {
       if (!groupId) {
         return NextResponse.json({ error: 'Group ID is required for group sends' }, { status: 400 });
       }
-      contactsQuery = contactsQuery.eq('group_id', groupId);
+      const { data: memberships, error: membershipsError } = await supabase
+        .from('contact_group_memberships')
+        .select('contact_id')
+        .eq('group_id', groupId);
+
+      if (membershipsError) {
+        console.error('Error fetching group members:', membershipsError);
+        return NextResponse.json({ error: 'Failed to retrieve group members' }, { status: 500 });
+      }
+
+      const memberIds = (memberships ?? []).map((m) => m.contact_id);
+      contactsQuery = contactsQuery.in('id', memberIds);
     } else if (sendToType === 'multiple_contacts') {
       if (!contactIds || !Array.isArray(contactIds) || contactIds.length === 0) {
         return NextResponse.json({ error: 'No contacts selected' }, { status: 400 });

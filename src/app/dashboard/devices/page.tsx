@@ -118,7 +118,7 @@ export default function DevicesPage() {
           <h1 className="text-3xl font-bold text-white text-glow">Android Gateways</h1>
           <p className="text-text-muted text-sm mt-1">Manage your connected sending devices.</p>
         </div>
-        <Button className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(66,245,230,0.3)]" asChild>
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(168,150,255,0.3)]" asChild>
           <Link href="/dashboard/devices/register">Register New Device</Link>
         </Button>
       </div>
@@ -173,14 +173,14 @@ export default function DevicesPage() {
           </div>
         ) : (
           <div className="p-20 text-center">
-            <div className="w-20 h-20 bg-accent/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-accent/10 shadow-[0_0_30px_rgba(66,245,230,0.05)]">
+            <div className="w-20 h-20 bg-accent/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-accent/10 shadow-[0_0_30px_rgba(168,150,255,0.05)]">
               <Smartphone className="w-10 h-10 text-accent/40" />
             </div>
             <h3 className="text-xl font-bold text-white">No devices registered</h3>
             <p className="text-text-muted max-w-xs mx-auto mt-2 text-sm">
               Register your first device to start sending automated SMS blasts.
             </p>
-            <Button className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(66,245,230,0.3)] px-8" asChild>
+            <Button className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(168,150,255,0.3)] px-8" asChild>
               <Link href="/dashboard/devices/register">Register Device</Link>
             </Button>
           </div>
